@@ -118,6 +118,32 @@ rule of 18 October); its C of the first block runs on the amended rig. Under the
 never by itself) the arm's table, when its three runs land, stays in the record (`results/live/`) and is not carried on the
 front page or the benefit board, as the orchestrator's third arm is kept.
 
+## Amendment 2 (31 October 2026, written before the runs it governs): Omni direct keeps every muscle Omni-Compass cannot be
+
+**The founder's order of 31 October**, on reading that the arm by itself had read like native: "Omni direct is directly to
+muscles, but Omni direct still might need an autoscaler like Kubernetes ... we still might need a muscle or two we're using. We're
+going straight into all the muscles as the brain and orchestrator, scheduler and all that, but what Omni-Compass can't do and
+needs the muscle for has to be achieved even in direct, so that it can work and do everything else ... Don't just embed some
+shit and fail the whole system because we don't have the muscle to do something ... Direct means we directly talk to and
+receive from the muscle, and give and use all; but any muscle that we don't have, Omni-Compass cannot be it: it has to be there,
+if that's Kubernetes or whatever."
+
+**What "by itself" means from this amendment on.** Omni-Compass talks to the muscles directly and is the brain, the
+orchestrator and the scheduler wherever it carries those muscles itself. A knob's native controller is switched off in this arm
+only where Omni-Compass carries that muscle and has proven, before the window, that it can move the knob (amendment 1's probe,
+by name). Every muscle Omni-Compass cannot be stays in the arm, native, under it: on Kubernetes the API server, the scheduler
+and the kubelet, and any autoscaler Omni-Compass has no muscle for on that platform (on kind the pod autoscaler is removed
+because Omni-Compass's own pod muscle takes the workload; kind has no cluster autoscaler; in a cloud the arm is not run). A knob
+left with no working controller fails the whole system and is never a result.
+
+**What the rig does.** (1) The preflight proves the pod write by name before the window (amendment 1). (2) A window in which
+any decision of Omni-Compass by itself failed is refused: by itself, a knob Omni-Compass owns has no other controller, so a
+failed decision left that knob unmoved (`scripts/kind_bench.sh`, `INVALID RUN: by itself ...`; `tests/test_kind_rig_rbac.py`).
+The three omni-v21 runs and the two omni-v22 runs of amendment 1 would have been refused by this rule at their first repetition.
+(3) The engine's own answer, a knob whose writes Omni-Compass finds refused handed back to native's own controller so the
+organism never runs with a hole, is the next version's guard, built on its own branch and gated against the engine that stands
+before it lands; until it lands a refused write ends the arm as invalid, never as a result.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

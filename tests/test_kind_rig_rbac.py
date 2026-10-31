@@ -58,6 +58,17 @@ class KindRigRbac(unittest.TestCase):
         # the autoscaler's end read is never unconditional: by itself there is no autoscaler to read
         self.assertIsNone(re.search(r'^\s*end_read "\$OUT_DIR/hpa_end\.json"', rig, re.M))
 
+    def test_by_itself_a_failed_decision_refuses_the_window(self):
+        # the founder's order of 31 October (docs/SOLO_PREREGISTRATION.md, amendment 2): by itself a knob Omni-Compass owns has
+        # no other controller, so a window in which one of its decisions failed left a knob with no controller and is refused
+        rig = (ROOT / "scripts/kind_bench.sh").read_text(encoding="utf-8")
+        i = rig.find('if [ "$ARM" = "solo" ]; then\n    # by itself, a knob Omni-Compass owns has no other controller')
+        self.assertGreater(i, 0)
+        block = rig[i:i + 1400]
+        self.assertIn("""grep -c '"consecutive_failures"' "$OUT_DIR/audit.jsonl\"""", block)
+        self.assertIn("INVALID RUN: by itself", block)
+        self.assertIn("exit 1", block)
+
 
 if __name__ == "__main__":
     unittest.main()

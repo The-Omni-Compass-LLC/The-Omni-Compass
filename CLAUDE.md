@@ -409,6 +409,32 @@ the founder overrides one in the conversation.
   `results/model_gate/` and never presented as a benchmark result. The model's regime is set from a real run's own files
   (the host's busy share, the response time, the replicas), never guessed.
 
+## Orders of 31 October
+
+- **Omni direct keeps every muscle Omni-Compass cannot be** (the founder's words of 31 October, on reading that the arm by itself
+  had read like native: "Omni direct is directly to muscles, but Omni direct still might need an autoscaler like Kubernetes ...
+  we still might need a muscle or two we're using. We're going straight into all the muscles as the brain and orchestrator,
+  scheduler and all that, but what Omni-Compass can't do and needs the muscle for has to be achieved even in direct, so that it
+  can work and do everything else ... Don't just embed some shit and fail the whole system because we don't have the muscle to
+  do something ... Direct means we directly talk to and receive from the muscle, and give and use all; but any muscle that we
+  don't have, Omni-Compass cannot be it: it has to be there, if that's Kubernetes or whatever"). Omni direct means Omni-Compass
+  talks to the muscles directly and is the brain, the orchestrator and the scheduler wherever it carries those muscles itself. A
+  knob's native controller is switched off in the direct arm only where Omni-Compass carries that muscle and has proven, before
+  the window, that it can move the knob; every muscle Omni-Compass cannot be (on Kubernetes the API server, the scheduler, the
+  kubelet, and any autoscaler it has no muscle for on that platform) stays, native, under it. A knob left with no working
+  controller fails the whole system and is never a result: the kind rig refuses a window of the arm by itself in which any
+  decision of Omni-Compass failed (`scripts/kind_bench.sh`, `docs/SOLO_PREREGISTRATION.md` amendment 2,
+  `tests/test_kind_rig_rbac.py`); the engine's own answer, a knob whose writes are refused handed back to native's controller so
+  the organism never runs with a hole, is the next version's guard, through the model gate. Found the same day (amendment 1):
+  every arm by itself since 24 October had its pod writes refused by the rig's own identity (the scale subresource was not
+  granted) and ran with no controller on the pod count; omni-v21's three runs of it and omni-v22's two are void, read in no
+  table, the entry queued again on the amended rig.
+- **Every fix pushed, the website following GitHub, the live engine defensible in line** (the founder's words of 31 October: "push
+  all the fixes into GitHub, so that the files in the GitHub are updated ... the live engine and all has to be 100% defensible in
+  line"). A fix is pushed to main as soon as its release check reads PASS, the kept branches levelled with it; the website follows
+  main's head; the live engine page on main is rebuilt by the repository's own code from the engine that stands, and every push
+  is read on GitHub's own verify before it is called done.
+
 ## Orders of 24 October
 
 - **One factory profile, found and then frozen; the live engine its tuning bench** (the founder's words of 24 October, late night:

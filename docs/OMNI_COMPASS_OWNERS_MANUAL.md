@@ -902,10 +902,12 @@ its own rule; Omni-Compass sets the ceiling that rule works under.
 This matters to a referee for a precise reason: every benchmark in this manual sets **omni** (Omni-Compass on native: the
 same system with Omni-Compass on top) against **native** (the system with its own controller, as shipped and as the operator
 set it), and there is no comparison in which Omni-Compass on native is a rival to that controller. Since the founder's order
-of 23 October a third arm, **Omni-Compass direct**, runs beside them: each knob's native controller switched off and
-Omni-Compass the only controller moving it (on Kubernetes no pod autoscaler and no cluster autoscaler, the scheduler and the
-kubelet kept; `--own-replicas`, omni-v19; in the models `realms/harness.py` SOLO; Omni-Compass's own orchestrator,
-`omni_orchestrator/`). Where native is a setting rather than a controller, or its own loop is the actuator, the two
+of 23 October a third arm, **Omni-Compass direct**, runs beside them: Omni-Compass talking to the muscles directly, a knob's
+native controller switched off only where Omni-Compass carries that muscle itself and has proven it can move the knob, Omni-Compass
+then the only controller moving it, and every muscle Omni-Compass cannot be kept, native, under it (the founder's order of 31
+October, `docs/SOLO_PREREGISTRATION.md` amendment 2; on Kubernetes the pod autoscaler removed where Omni-Compass's own pod muscle
+takes the workload, no cluster autoscaler on kind, the API server, the scheduler and the kubelet kept; `--own-replicas`, omni-v19;
+in the models `realms/harness.py` SOLO; Omni-Compass's own orchestrator, `omni_orchestrator/`). Where native is a setting rather than a controller, or its own loop is the actuator, the two
 Omni-Compass arms are one arm; no cloud runs direct without the founder's word (`docs/SOLO_PREREGISTRATION.md`). The three
 are always shown together, each pair read on its own. A gain is therefore always "what the governor added on top of what the native controller already did", and a
 loss is always "what the governor cost on top of it". Nothing in the record is an argument against any native controller;
