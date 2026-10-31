@@ -610,7 +610,7 @@ together, and each pair is read on its own: omni against native, direct against 
 |---|---|---|
 | Native | the native controllers alone, as shipped and as the operator set them | the governor not installed, or OFF (chapter 9) |
 | Omni-Compass on native (omni) | the native controllers, with Omni-Compass moving the settings they expose | the governor at the level granted (chapter 7) |
-| Omni-Compass direct | Omni-Compass alone; each knob's native controller switched off (on Kubernetes the pod autoscaler removed from the workload; the scheduler and the kubelet stay) | `--own-replicas namespace/name` on a workload no autoscaler governs (Appendix K); on the kind rig `ARM=solo` (`scripts/kind_bench.sh`); chapter 11 |
+| Omni-Compass direct | Omni-Compass talking to the muscles directly, the brain, the orchestrator and the scheduler wherever it carries those muscles itself; a knob's native controller switched off only where Omni-Compass carries that muscle and has proven it can move the knob, and every muscle Omni-Compass cannot be kept, native, under it (on Kubernetes the pod autoscaler removed from the workload Omni-Compass's own pod muscle governs; the API server, the scheduler and the kubelet stay; the founder's order of 31 October, `docs/SOLO_PREREGISTRATION.md` amendment 2) | `--own-replicas namespace/name` on a workload no autoscaler governs (Appendix K); on the kind rig `ARM=solo` (`scripts/kind_bench.sh`); chapter 11 |
 
 Where native is a setting and not a controller (a cache's ceiling, a buffer pool, a pooler's pool size, a consumer group's
 size), or where native's own loop is the actuator and cannot be switched off (the card's firmware, a servo, an autopilot, a

@@ -965,6 +965,13 @@ for line in open(sys.argv[1]):
 PY
   [ $(( decisions * 10 )) -ge $(( expected * 8 )) ] || { echo "INVALID RUN: the controller made $decisions of its $expected decisions inside the window (under 80%)"; exit 1; }
   ! grep -q '"failsafe"' "$OUT_DIR/audit.jsonl" || { echo "INVALID RUN: the fail-safe handed control back to native"; exit 1; }
+  if [ "$ARM" = "solo" ]; then
+    # by itself, a knob Omni-Compass owns has no other controller (the founder's order of 31 October: every muscle Omni-Compass
+    # cannot be stays; a knob left with no working controller fails the whole system): a decision that failed left that knob
+    # unmoved, so the window is refused (docs/SOLO_PREREGISTRATION.md, amendment 2)
+    refused=$(grep -c '"consecutive_failures"' "$OUT_DIR/audit.jsonl" || true)
+    [ "$refused" -eq 0 ] || { echo "INVALID RUN: by itself, $refused decisions of Omni-Compass failed and left a knob it owns with no controller (the last: $(grep '"consecutive_failures"' "$OUT_DIR/audit.jsonl" | tail -1 | cut -c1-300))"; exit 1; }
+  fi
   if [ -n "$KEDA" ]; then
     # the add-on test counts only if every move Omni-Compass made on the autoscaler reached KEDA whole
     pl="$OUT_DIR/plug_keda.jsonl"

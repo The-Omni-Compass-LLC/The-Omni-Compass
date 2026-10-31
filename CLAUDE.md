@@ -101,7 +101,7 @@ the founder overrides one in the conversation.
   cover, never below the operator's count at the max, reconciled every 15 s on the fast checks (`--own-every-s`, the pod
   autoscaler's sync), the compass moving the target only in a decision, the operator's count handed back by the reset; and the
   models' arm by itself (`realms/harness.py` `SOLO`, `realms/plants.py` `native_off`). 59 of its 62 files are omni-v18's bytes.
-  **One name, two engines, reconciled**: the change was first landed on the live benchmark engine's branch on 24 October, 01:30 UTC, under the
+  **One name, two engines, reconciled**: the change was first landed on the live engine's branch on 24 October, 01:30 UTC, under the
   name omni-v18 (digest `22486290b19349eb`, 55 files, on omni-v17) while main's omni-v18 stood; that engine never stood on main and
   none of its records is read as main's omni-v18; its change, taken onto main's omni-v18 and gated again against it, is omni-v19
   (the code's comments that named the branch's numbers now name omni-v19; every rule is the branch's). The model gate against omni-v18
@@ -109,7 +109,7 @@ the founder overrides one in the conversation.
   gate against omni-v17 printed; no LOSS against omni-v18; in the models the native and max arms read byte-identical on both engines
   (806 readings on the development seeds). By itself in our own model (`results/model_gate/SOLO_V19.md`, class S) against native on
   the same machines: the 95th percentile GAIN (down 19.4%), the minutes over the response line GAIN (down 64.9%), machines and
-  energy STEADY; against omni-v18 by itself, which holds every workload at the operator's count
+  energy EVEN; against omni-v18 by itself, which holds every workload at the operator's count
   (`results/model_gate/SOLO_V19_VS_V18.md`), the 95th percentile GAIN (down 100.0%) and the minutes over the line GAIN (down 99.3%). A
   fault found on the branch before it landed there (at the 60 s beat the first candidate moved pods once a minute; the minutes over
   the line read LOSS) is fixed in it. The real arm: `ARM=solo` on kind (`docs/SOLO_PREREGISTRATION.md`; `kubernetes by itself` in
@@ -130,10 +130,10 @@ the founder overrides one in the conversation.
   form after the fix, one run each, class L: Omni on native against native work GAIN (up 8.3%); Omni direct against native work
   GAIN (up 9.1%); Omni direct against Omni on native the 95th percentile GAIN (down 13.2%), units GAIN, a cut (down 9.5%); no
   LOSS in any pair. The three runs on GitHub's machines (full form, `results/orchestrator/V18_THREE_ARMS_ABC.md`): both Omni
-  arms against native work GAIN and the 95th percentile GAIN in all three, machines STEADY, units power given or STEADY; Omni direct
-  against Omni on native STEADY on every gauge; no LOSS. The model gate against omni-v17 (`results/model_gate/V18_VS_V17.md`) reads omni-v17's numbers on every model (none
+  arms against native work GAIN and the 95th percentile GAIN in all three, machines EVEN, units power given or EVEN; Omni direct
+  against Omni on native EVEN on every gauge; no LOSS. The model gate against omni-v17 (`results/model_gate/V18_VS_V17.md`) reads omni-v17's numbers on every model (none
   of its 55 files moved). Every benchmark runs again on it from 02:51 UTC on 24 October, when it reached main (a run counts only on a commit
-  that carries `OMNI_V18.json`; the runs started from 21:19 UTC on 23 October ran omni-v17's commits). (Not to be confused with the live benchmark engine's branch's own omni-v18 of 24 October, digest
+  that carries `OMNI_V18.json`; the runs started from 21:19 UTC on 23 October ran omni-v17's commits). (Not to be confused with the live engine's branch's own omni-v18 of 24 October, digest
   `22486290b19349eb`, 55 files, which never stood on main: its change is omni-v19's.)
 - **Omni v17** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files; `docs/OMNI_V17.md`) stood on main on 23 October, from the
   morning to the night, on the founder's order of 22 October, afternoon (Orders of 22 October, the heartbeat a dial): the main engine takes its full
@@ -146,11 +146,11 @@ the founder overrides one in the conversation.
   machine in service (the kind setting's first reading: machine-hours +17% and +21% against 60 s, the minutes over the line −72%);
   the cruise wait is now never fewer than two readings (`tests/test_pace_clocks.py`, failing on the unfixed rule), and nothing at
   80 s or faster moves. 54 of its 55 files are omni-v16's bytes. Corrected, the kind benchmark's setting reads at 90 s, against 60
-  s, the machine-hours down 1.7%, STEADY, the minutes over the line down 4.7%, STEADY, the pods waiting down 12.1%, STEADY, the 95th percentile down 0.2%,
-  STEADY; at 120 s the machine-hours down 2.1%, STEADY, the minutes over the line down 3.7%, STEADY, the pods waiting down 29.6%, GAIN; machines parked
+  s, the machine-hours down 1.7%, EVEN, the minutes over the line down 4.7%, EVEN, the pods waiting down 12.1%, EVEN, the 95th percentile down 0.2%,
+  EVEN; at 120 s the machine-hours down 2.1%, EVEN, the minutes over the line down 3.7%, EVEN, the pods waiting down 29.6%, GAIN; machines parked
   over the eight days 190 and 119 against 329 at 60 s. The model gate against omni-v16 (`results/model_gate/V17_VS_V16.md`): Every model
   that sets its own period reads identical to omni-v16 on every gauge and every seed (9 models and the verdict); as shipped,
-  omni-v17 at its 60 s against omni-v16 at its 15 s, every gauge reads STEADY; no LOSS against omni-v16. The ladder: Every beat
+  omni-v17 at its 60 s against omni-v16 at its 15 s, every gauge reads EVEN; no LOSS against omni-v16. The ladder: Every beat
   reads the cluster from about 86,400 times a day at 5 s to 37,400 at 120 s (39,700 at the main engine's 60 s), for 5.5 to 1.6 s
   of Omni's own processor an hour. In the kind benchmark's setting every beat reads the minutes over the line GAIN against native
   (−12.0% at the main engine's 60 s, −28.2% at its most), for machine-hours and energy given; the rows that read LOSS against
@@ -177,10 +177,10 @@ the founder overrides one in the conversation.
   pace; the pace sets only how soon trouble is seen, and a longer one would only blind the governor longer (the founder's question
   of 22 October, answered so). At 60 s it makes exactly omni-v15's decisions (the model gate, `results/model_gate/V16_VS_V15.md`: 4,578
   audit records, none different). The pace study (`results/model_gate/V16_PACE.md`, a plant that moves every 5 s): 15 s against 60 s,
-  alert minutes −14.7% in the kind setting and energy per core −2.6% in the cloud's (GAIN), every other reading STEADY, no LOSS at
-  any pace; as shipped (the gate's `cluster_shipped`, omni-v16 at 15 s against omni-v15 at 60 s) every gauge STEADY. Against native
+  alert minutes −14.7% in the kind setting and energy per core −2.6% in the cloud's (GAIN), every other reading EVEN, no LOSS at
+  any pace; as shipped (the gate's `cluster_shipped`, omni-v16 at 15 s against omni-v15 at 60 s) every gauge EVEN. Against native
   the pods waiting for a place read LOSS at every pace, the old 60 s default included, and in the cloud's setting at 15 s the 95th
-  percentile (+0.36% to +0.47%) and the alert minutes (+2.31%), which read STEADY at 60 s only by the seeds' spread: the engine's, on
+  percentile (+0.36% to +0.47%) and the alert minutes (+2.31%), which read EVEN at 60 s only by the seeds' spread: the engine's, on
   the next version's list. The real runs (`docs/PACE_PREREGISTRATION.md`, amendment 2: native, Omni-Compass at 15 s, and at 60, 10
   and 5 s, three runs) read the heartbeat for real. The seal is written under Python 3.12 (its compensated `sum` is what the C++
   engine-runs twin follows; 3.11's differs by one rounding step). Every benchmark runs again on it: its campaign opened at 07:30 UTC
@@ -199,7 +199,7 @@ the founder overrides one in the conversation.
   fingerprint (`tools/omni_version.py`: the data stores' five runners, the swarm, MuJoCo and the CPU power runner, their bytes as
   they stood; a version declared before them is read without those eight and only those). Declared with it, not an engine change: the kill test reads the
   300 s after the kill (`docs/ROBUSTNESS_PREREGISTRATION.md`, "On omni-v15"). The model gate against omni-v14
-  (`results/model_gate/V15_VS_V14.md`, eight seeds, every model and two card models new with it) read every service gauge identical on every model, the card models identical (the card governor already applied the gate outside the brain), the verdict identical, and the request's own moves, reversals and travel STEADY on the model cluster (+3.7% at 60 s, −1.4% at 15 s, where breaches are rare and short; the fault's regime, the long run's clustered breaches, reads −72% on the run's own decisions): no LOSS. Its campaign opened at
+  (`results/model_gate/V15_VS_V14.md`, eight seeds, every model and two card models new with it) read every service gauge identical on every model, the card models identical (the card governor already applied the gate outside the brain), the verdict identical, and the request's own moves, reversals and travel EVEN on the model cluster (+3.7% at 60 s, −1.4% at 15 s, where breaches are rare and short; the fault's regime, the long run's clustered breaches, reads −72% on the run's own decisions): no LOSS. Its campaign opened at
   02:30 UTC on 22 October and started no run: the conductor read every commit from omni-v15's push on as no engine (Orders of 22
   October); the last runs it started, at 00:31 UTC, were omni-v14's.
 
@@ -283,7 +283,7 @@ the founder overrides one in the conversation.
   added while that runner is 75% busy or unread, `omni_controller/capacity.py`), plus conveyance bounded by each
   namespace's CPU quota (`omni_controller/quota.py`; an unreadable quota is no budget known, Kubernetes admission is the
   authority), on a shared host no limit raised while the machine is 75% busy or unread, the verdict reading a trial in
-  the reports' words (GAIN, STEADY, LOSS: a clear rise refused), every rule in seconds, the cloud's one flag
+  the reports' words (GAIN, EVEN, LOSS: a clear rise refused), every rule in seconds, the cloud's one flag
   `--give-back-only`. Two repairs first written for the KEDA pod start wait were refused by the model gate and are not in
   it. Its seventeen three-run tables of 17 October (`results/live/V7_*.md`) and its twelve trial runs of 16 October
   (Goldilocks, KEDA's add-ons, fixed capacity, CruiseKube; A, B and C) are its own. **Omni v6** (`OMNI_V6.json`, `docs/OMNI_V6.md`) stood one day, 15 to 16 October; its four
@@ -305,7 +305,7 @@ the founder overrides one in the conversation.
   that passes the model gate with no LOSS lands, and he hears what it changed.
 - Three runs: each benchmark runs as A, B and C (`tools/confirm_abc.py`). Every judged row gets one of three
   readings: GAIN or LOSS in all three of our runs (the same sign in all three, every 95% interval clear of zero, the word
-  set by the gauge's aim; a resource spent that rose is power given); STEADY, no difference beyond the noise (an interval includes zero: that is the result, say so); the runs disagree (clear runs
+  set by the gauge's aim; a resource spent that rose is power given); EVEN, no difference beyond the noise (an interval includes zero: that is the result, say so); the runs disagree (clear runs
   pointing different ways: the test is unstable there, look into it). Never write "confirmed" or "not confirmed"
   (the founder's order of 11 October: nobody outside approved these results); every three-run table says "Run and
   scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results."
@@ -403,28 +403,41 @@ the founder overrides one in the conversation.
   before it is pushed, and goes to a real run only where it shows promise there). Every change to the engine or to a
   live controller runs in our own models (`tools/model_gate.py`: the shipped controller on the model cluster in the cloud
   setting at 60 and 15 s, conveyance on one kind host set to the v6 KEDA run's own regime, the verdict on noisy work)
-  against the engine that stands, on the same seeds, paired, read GAIN, STEADY or LOSS by the gauge's aim. A LOSS there
+  against the engine that stands, on the same seeds, paired, read GAIN, EVEN or LOSS by the gauge's aim. A LOSS there
   is root-caused and fixed in the model, never carried into a real run; a change that reads no LOSS and shows promise
   goes to its GitHub trials; nothing is dispatched before. The gate's readings are models (class S), recorded in
   `results/model_gate/` and never presented as a benchmark result. The model's regime is set from a real run's own files
   (the host's busy share, the response time, the replicas), never guessed.
 
-## Orders of 26 October
+## Orders of 31 October
 
-- **The solid-A directive** (the founder's work order, pasted from a referee, 26 October: "No fake gains. No hidden losses. No
-  invented proofs. No forced controller actions. No changing the measurements to improve a grade"): ten phases, a defect ledger,
-  ten release gates, no gate marked PASS unless it ran, no grade declared while one is open. What has run is in `docs/audit/`
-  (`README.md` there lists what has not).
-- **Nothing hardwired in the reflex** (the founder's words: "Nothing is hardwired. Everything moves with the mechanism ... only the
-  bands are bands"): the page's redline reflex takes the engine's own numbers as its factory setting and carries every one as a
-  knob; each light reads the live reading against its own band.
-- **The repository read top down, by reader** (the founder's words: "lined up in structured hierarchically presentation ... CTO,
-  CFO, CEO, board meeting ... from top to bottom"): the README and `docs/README.md` open with the documents by reader and the
-  hierarchy of evidence and claims, after the headline.
+- **Omni direct keeps every muscle Omni-Compass cannot be** (the founder's words of 31 October, on reading that the arm by itself
+  had read like native: "Omni direct is directly to muscles, but Omni direct still might need an autoscaler like Kubernetes ...
+  we still might need a muscle or two we're using. We're going straight into all the muscles as the brain and orchestrator,
+  scheduler and all that, but what Omni-Compass can't do and needs the muscle for has to be achieved even in direct, so that it
+  can work and do everything else ... Don't just embed some shit and fail the whole system because we don't have the muscle to
+  do something ... Direct means we directly talk to and receive from the muscle, and give and use all; but any muscle that we
+  don't have, Omni-Compass cannot be it: it has to be there, if that's Kubernetes or whatever"). Omni direct means Omni-Compass
+  talks to the muscles directly and is the brain, the orchestrator and the scheduler wherever it carries those muscles itself. A
+  knob's native controller is switched off in the direct arm only where Omni-Compass carries that muscle and has proven, before
+  the window, that it can move the knob; every muscle Omni-Compass cannot be (on Kubernetes the API server, the scheduler, the
+  kubelet, and any autoscaler it has no muscle for on that platform) stays, native, under it. A knob left with no working
+  controller fails the whole system and is never a result: the kind rig refuses a window of the arm by itself in which any
+  decision of Omni-Compass failed (`scripts/kind_bench.sh`, `docs/SOLO_PREREGISTRATION.md` amendment 2,
+  `tests/test_kind_rig_rbac.py`); the engine's own answer, a knob whose writes are refused handed back to native's controller so
+  the organism never runs with a hole, is the next version's guard, through the model gate. Found the same day (amendment 1):
+  every arm by itself since 24 October had its pod writes refused by the rig's own identity (the scale subresource was not
+  granted) and ran with no controller on the pod count; omni-v21's three runs of it and omni-v22's two are void, read in no
+  table, the entry queued again on the amended rig.
+- **Every fix pushed, the website following GitHub, the live engine defensible in line** (the founder's words of 31 October: "push
+  all the fixes into GitHub, so that the files in the GitHub are updated ... the live engine and all has to be 100% defensible in
+  line"). A fix is pushed to main as soon as its release check reads PASS, the kept branches levelled with it; the website follows
+  main's head; the live engine page on main is rebuilt by the repository's own code from the engine that stands, and every push
+  is read on GitHub's own verify before it is called done.
 
 ## Orders of 24 October
 
-- **One factory profile, found and then frozen; the live benchmark engine its tuning bench** (the founder's words of 24 October, late night:
+- **One factory profile, found and then frozen; the live engine its tuning bench** (the founder's words of 24 October, late night:
   "once every knob is tuned for every organism ... lock that as its package tuned one setting system engine ... anybody can tweak
   and turn anything ... We ain't got to the basic yet. You just keep building it right, and we will sim it sooner or later once I
   know all the mechanisms are right"; then his master specification, the same night). The common language is written once,
@@ -434,7 +447,7 @@ the founder overrides one in the conversation.
   unit of completed production); the eight steps that establish **the best validated factory profile for the declared operating
   conditions**; the contract every implementation (Python, C++, the browser) shares; and the two restoring controls, Restore
   factory profile and Return to native. No profile is locked as the baseline before those steps: the released factory profile
-  (omni-v19's) stands, the live benchmark engine names the active profile (factory, candidate or custom, with its fingerprint), and a
+  (omni-v19's) stands, the live engine names the active profile (factory, candidate or custom, with its fingerprint), and a
   candidate is evaluated, never released, until it is validated and declared.
 - **Red only as a stop sign** (the founder's words: "That red sign is never to be a circle. It is an eight stop sign shape
   octagon ... The yield is the diamond ... the circle is green only everywhere it lives"). Every red light and red mark is an
@@ -451,7 +464,7 @@ the founder overrides one in the conversation.
   gain is a benefit or a minus is a plus"). The one key (`tools/readings.py` `three_run_reading`): the change is the mean of the
   three runs' changes in percent of native; from 0.5% up it reads GAIN, LOSS or power given by what the gauge is for, "in all
   three of our runs" where every run moved the same way clear of zero, otherwise "by the mean of our three runs" with the count of
-  runs beyond the noise; STEADY is kept for a mean under 0.5% (STEADY, under the floor) or no change at all; runs that moved 0.5% or
+  runs beyond the noise; EVEN is kept for a mean under 0.5% (EVEN, under the floor) or no change at all; runs that moved 0.5% or
   more in opposite directions read "the runs disagree"; a count that must never rise has no floor. Each run's own number wears
   that run's own word. Every table was read again from its own data by `tools/reread.py` (24 October: 4,037 readings in 194
   tables; the index's headline GAIN, up 3.4%), the model gate reads by the same floor, and the live engine's own key with it.
@@ -461,7 +474,7 @@ the founder overrides one in the conversation.
   muscle whose own markers turn against native (pods waiting, a response over its line, failures) sends its signal to the muscle
   that caused it, and that muscle backs off toward native: the next version's work, through the model gate (first: the autoscaler
   target never asks for more pods than the machines can place while pods wait, the pods-waiting LOSS's root cause).
-- **The live benchmark engine in the order a watcher needs it** (the founder's words of 24 October): the page, its contents and its
+- **The live engine in the order a watcher needs it** (the founder's words of 24 October): the page, its contents and its
   instructions laid out by importance to the operator watching the system, first to last; on every monitor of Omni on native a
   switch that turns native off and leaves Omni direct on the organism with no other governor; live knobs, buttons and switches on
   every muscle that can scale out, up or down, each acting on the running code; buttons that run another set of the Python's 500
@@ -495,14 +508,14 @@ the founder overrides one in the conversation.
 - **The brain finds the win; nobody turns a knob for it** (the founder's words: "the brain should have fucking wired it out";
   "it's supposed to be built in omnicompasses mechanism, defensive system, immune system, nervous system, pathways of signals
   moving through ... it should react with the same benefit ... Unless by taking less can show more, or vice versa"). A result
-  that reads STEADY where the organism has room is a mechanism not yet wired, found in the files and wired (23 October: the
+  that reads EVEN where the organism has room is a mechanism not yet wired, found in the files and wired (23 October: the
   response time was the unit's own paper quota, not a shortage of units; the engine's conveyance gives the unit the processor
   its machine can spare: faster, with no unit and no machine added). The win is said only when the run's own files read it.
 - **Where a LOSS may ever be seen** (the founder's words: "Nothing should be shown as a loss because it would have been fixed
-  and never gone there. The only way we're going to ever see a loss ... is in the live benchmark engine when people turn knobs and turn
+  and never gone there. The only way we're going to ever see a loss ... is in the live engine when people turn knobs and turn
   and tweak it to a point that fucks it up ... and that's the only benchmark proof that needs to be"). The factory tune reads
   no LOSS anywhere; a LOSS found in our own runs is a fault, fixed before anything is published, never shown as a result. The
-  live benchmark engine's knobs (the dial, the heartbeat, the sizes 1, 10, 100, more or less load) exist so a person can see the system
+  live engine's knobs (the dial, the heartbeat, the sizes 1, 10, 100, more or less load) exist so a person can see the system
   react, break it by hand and watch the brain hold or recover: that is the one place a LOSS is ever shown, as the proof that
   the factory tune is the best state and that the mechanism can be broken only by leaving it.
 - **A reading leads with the word, never the sign** (the founder's words: "a loss can be a gain and a gain can be a loss
@@ -529,7 +542,7 @@ the founder overrides one in the conversation.
   gate, and its runs go to GitHub's machines, three runs, read beside the other two. No cloud by itself without the founder's word
   (the order of 14 October: nothing in a cloud adds a machine). The pages and the words say the three arms; the third's column appears
   from its first run, nothing written for it before.
-- **The live benchmark engine is the operating control panel** (the founder's words: "build a live benchmark engine's mechanism, interpreting what it
+- **The live engine is the operating control panel** (the founder's words: "build a live engine's mechanism, interpreting what it
   sees, as well as giving it knobs and buttons ... in every canvas section block ... every monitor needs to have a light in it ...
   gauging a couple percentage before ... there has to be a main button that puts it back"). Every monitor carries a light that reads
   the series it draws: green inside its lines, amber before the line (within 3% of it, or its own slope over the last readings crossing
@@ -538,7 +551,7 @@ the founder overrides one in the conversation.
   wall and every monitor's knobs, returns every knob to the factory tune and says what it put back; native alone stays the kill switch.
 - **The sign explained where the number sits** (the founder's words: "you cannot just put minus 29 gain or down 29% and then say gain
   ... you need to now explain that wherever things are"). A number beside a word wears the word's sign (the order of 22 October), and
-  wherever it stands the reason stands with it: on the live benchmark engine every word and size carries it on hover, and the key says it once in
+  wherever it stands the reason stands with it: on the live engine every word and size carries it on hover, and the key says it once in
   full ("How to read a number beside a word"); in prose a change is said in its verb with its reading ("pods waiting down 29.6%: fewer
   waiting, GAIN"), never a bare sign beside a word.
 - **The factory beat is the best beat the sweeps read** (the founder's words: "whatever is the best one out of all that helps the best
@@ -546,70 +559,38 @@ the founder overrides one in the conversation.
   on the organism's gauges, not a number chosen for a reason of its own; the beats the ladder has not read (45, 40, 50, 20 s) are
   read in the model on the side first, and a beat that reads best lands as the next version through the model gate. The knobs stay for
   anyone to turn. Read the same evening (`results/model_gate/V17_LADDER.md`, class S): against 60 s in the kind benchmark's setting the
-  minutes over the line GAIN at 20 s (+14.7%) and 40 s (+13.2%), STEADY at 45 and 50 s, every other gauge STEADY, the reads and the
-  governor's own processor power given; in the cloud's setting every gauge STEADY. 60 s is not the beat that reads best on the service.
+  minutes over the line GAIN at 20 s (+14.7%) and 40 s (+13.2%), EVEN at 45 and 50 s, every other gauge EVEN, the reads and the
+  governor's own processor power given; in the cloud's setting every gauge EVEN. 60 s is not the beat that reads best on the service.
 - **A LOSS at the factory tune is a fault to fix, never a number to accept** (the founder's words: "nothing should be shown as a loss
   because it would have been fixed and never gone there. The only way we're going to ever see a loss is ... when people turn knobs").
   Every LOSS row is still shown (Honesty); each one on the engine that stands is on the next version's list with its cause, and the
-  live benchmark engine's knobs are where a reader may break the engine and watch it break.
+  live engine's knobs are where a reader may break the engine and watch it break.
 - **Omni-Compass at every level** (the founder's words: "OmniCompass can go in the software side, in the hardware bare metal side ...
   in the brain ... in muscles itself ... into a chip ... every level of mechanism"). Its own muscles, built from the ground up with the
   compass's mathematics inside (a pod autoscaler of its own first), beside the open-source muscles it governs, each benchmarked native,
   with Omni-Compass on top, and by itself, and all of it together: the next versions' work, each through the model gate. A licensed
   mechanism is never copied; an interface a project publishes (the Kubernetes API) is talked to, as any client does.
-- **Red and green on every monitor; every variation a knob; the live benchmark engine the real engine** (the founder's words of 23 October,
+- **Red and green on every monitor; every variation a knob; the live engine the real engine** (the founder's words of 23 October,
   night: "Every monitor is to have a red and green button as red is alert ... green has got to be good ... knobs, buttons that allow
   you to switch amongst all the different organisms ... direct, native, Omni on native ... 1, 10, 100 ... A, B, and C runs ... 5
   seconds ... 45 ... 120 seconds in the heartbeat ... buttons to run multiple Python hashtag jump generator run variances ... physical
   buttons that show these reports in some form of PDF ... for CTOs ... boards and all the CFOs"). Every monitor's light is a button
-  in three colours (green working, yellow heading for its line or STEADY on a record, red an alert; the founder's word of 24 October:
+  in three colours (green working, yellow heading for its line or EVEN on a record, red an alert; the founder's word of 24 October:
   "Yellow would mean it's even"), native's side and Omni-Compass's apart where a monitor draws both, on the page and on the Grafana wall; one switchboard sets the arm, the organism, the
   copies, the runs, the run letter and the beat on every monitor that carries that variation and names the ones that do not; the
   Python's runs can be run again from the page (another 500, and variants on the tuning set's knobs) and on GitHub; the reports for
   engineers, CTOs, boards and CFOs print from the page, every reading by the one key, every number with its run's number (#run).
   Whatever the page computes is the engine's own code and says its class; nothing on it is written as commentary.
 
-## Orders of 25 October
-
-- **EVEN becomes STEADY** (the founder's words, twice: "No, I like even to become steady"; and earlier the same day, "I already see
-  you use other places the word steady, which is also the same word as even ... I would have liked to have one only"). The three
-  words are GAIN, STEADY and LOSS, the number beside STEADY wearing = ("=0.3% STEADY"); the yellow signal light is STEADY too, one
-  word for both. The key (`tools/readings.py`) reads STEADY and still reads EVEN wherever an older record or an engine file locked
-  by its fingerprint writes it (`omnicompass/verdict.py`, `tools/run_citylearn.py`, `tools/run_mujoco.py`,
-  `omni_controller/muscles.py` and the C++ verdict take the word with the next engine version). The letters: S.T.E.A.D.Y. Stable,
-  True to baseline, Equilibrium, At par, Drift-free, Yield held. The license texts keep their own English "EVEN IF".
-- **A LOSS counts against Omni-Compass only when it is Omni-Compass's** (the founder's words: "if any the loss is only on
-  OmniCompass's ... If it's a loss on the ... orchestrators by on top of the organisms, that's their problem to show"). A governor
-  on an organism read against native is the governor's own reading, shown as the governor's and counted apart.
-- **Fix, fix, fix** (the founder's words on the data stores' losses): every fault found is fixed at its cause and lands as the next
-  version (omni-v20, `docs/OMNI_V20.md`).
-- **The Omni-Compass Live Benchmark Engine** (the founder's words: "It needs to be called the OmniCompass live benchmark engine. The
-  only thing we're showing in this engine is all the benchmarks of proving natives against OmniCompass on top of native"). The page,
-  its manual (the Live Benchmark Engine Manual) and every page that names it say so. Its front matter states: native is the stack as
-  it runs today, its fragmented organisms of muscles run by Kubernetes and the open-source orchestrators, schedulers, autoscalers,
-  governors and managers; only what could be run and proven was benchmarked, what could not be seen is not shown; the rest of the
-  story is written when others benchmark, critique and analyse Omni-Compass, and needs to be.
-- **The colour key on every monitor number**: Omni-Compass blue behind the number of an Omni-Compass monitor, native orange behind a
-  native one, black type; a monitor that draws both sides carries both, orange first. Fixed: no switch recolours the key.
-- **The signal, read on the band**: GAINING (green, low in its band with room to climb), STEADY (yellow, inside its band), REDLINING
-  (red, blinking red and black, at the top of its band and holding there), OVER THE LINE (red, blinking red and white, past the
-  band). "THRIVING" is not used. Each light reads what its gauge is for: a needle that falls is not a LOSS and one that rises is not
-  a GAIN. The word EVEN is not used anywhere a person reads (STEADY); "break-even" is written "par".
-- **The referee's work order of 25 October** (forwarded by the founder): every row shows native's value, Omni-Compass's and the raw
-  change with its true sign, apart from its word; "STEADY, the same" only to nine decimal places (`tools/readings.py` `EXACT_REL`);
-  evidence strength beside every word (`evidence`); one selection and one count (`tools/verdict_audit.py`, which the LOSS ledger
-  and the appraisal read); the discrepancy report (`results/verdict_audit/DISCREPANCIES.md`). The kill switch bar folds to a small
-  pill, half its size.
-
 ## Orders of 22 October
 
 - **One tuned engine, and a tuning bench; the main tune found, not guessed** (the founder's words, the night of 22 October: "what
-  the live benchmark engine is versus the main ... benchmark engine is two different things ... the real benchmarks that we're showing are
+  the live engine is versus the main ... benchmark engine is two different things ... the real benchmarks that we're showing are
   proving a one set tuned engine ... and must explain and disclose that any turns and tweaks of knobs can change all metrics in
   any form"; "like any regular engine, carburetor to intake, outtake to pistons, to fires ... to show the versatility of an engine
   that can be put in many vessels, tuned many ways, achieve many outputs"; and "the main engine ... is the most tuned engine in its
   most optimal state that you will go through and find and confirm"). Every benchmark is the main engine at its one factory tune;
-  the live benchmark engine page is a live tuning engine (every knob, button and monitor turned in real time, native alone, Omni-Compass on
+  the live engine page is a live tuning engine (every knob, button and monitor turned in real time, native alone, Omni-Compass on
   top, or both), whose readings at any other setting show the engine's range and are never a benchmark result; every page says
   that turning any knob can change every metric in any direction (`DISCLOSURES.md` section 3, the README, the live page's first
   box `#tuningBench`, all three manuals). The factory tune is chosen by a declared rule (`docs/THE_TUNE.md`, the Owner's Manual
@@ -646,18 +627,18 @@ the founder overrides one in the conversation.
   (`tools/heartbeat_sweep.py`, our own model, class S; the record `results/model_gate/HEARTBEAT_SWEEP.md`, written again from its
   runs by `tests/test_heartbeat_sweep.py`) reads the engine that stands and the one before it at every beat from 5 to 120 s,
   on-site and in the cloud. Each beat is read against native and against the same engine at 15 s and 60 s, with the engine's own
-  cost and the fast check's rescues (a machine added only after a pod waited). The live benchmark engine's monitor `beatCv` (section 5c,
+  cost and the fast check's rescues (a machine added only after a pod waited). The live engine's monitor `beatCv` (section 5c,
   after the heart) has a button for each beat, setting, engine, zero line and gauge. The factory's beat is the main engine's 60 s since omni-v17
   (the dial above); another beat is a changed tune, its receipts its own. On omni-v16 (our own model, class S): on-site every beat reads GAIN against native in
   pods waiting (GAIN +83.5% at 5 to 15 s, +72.9% at 60 s, +57.0% at 120 s), at 5 to 15 s with about 3% more machine-hours (power
   given +2.9%); a beat slower than 60 s waits more than the factory's 15 s (86% to 160% more, LOSS at 90 s) for at most 0.4 points
   fewer machines than 60 s, and the fast check's rescues rise from none at 15 s to 3 a day at 120 s. In the cloud, the machines
   alone, 5 to 15 s cut the machine-hours 1.5% to 1.8% (GAIN) with pods waiting +15% to +17% (LOSS, the engine's, on the next
-  version's list, as omni-v16's own pace study found); from 20 s to 120 s the waiting reads STEADY and the cut 0.7% to 1.4%.
+  version's list, as omni-v16's own pace study found); from 20 s to 120 s the waiting reads EVEN and the cut 0.7% to 1.4%.
 - **The number beside a word carries the word's sign** (the founder's words, 22 October, night: "If it's a gain, it should be a
   plus 73 with the word gain. When you put a minus, it confuses me ... that word gain can never have a minus beside the word
-  gain"; the key's own rule of 20 October, said again). GAIN +, LOSS −, STEADY =, power given +: "+73.0% GAIN", "−16.8% LOSS",
-  "=0.9% STEADY"; an interval beside GAIN or LOSS is its two sizes with the word's sign ("+47.3% to +127.5%"), beside STEADY as it
+  gain"; the key's own rule of 20 October, said again). GAIN +, LOSS −, EVEN =, power given +: "+73.0% GAIN", "−16.8% LOSS",
+  "=0.9% EVEN"; an interval beside GAIN or LOSS is its two sizes with the word's sign ("+47.3% to +127.5%"), beside EVEN as it
   lies. The heartbeat monitor had printed the gauge's raw direction ("−73% GAIN"); the key's formatter (`tools/readings.py`
   `by_word`, `interval_by_word`) now prints every number beside a word in the three-run tables, the receipts, the model gate, the
   heartbeat sweep and the live engine's trading floor, index, verdict and heartbeat monitor.
@@ -734,7 +715,7 @@ the founder overrides one in the conversation.
 - **Do no harm means the organism** (the founder's words: "its real goal is to strengthen the organism and keep it healthy
   in any form and keep it working in its most optimal state that the organism can live within its own muscles ... If that
   means decreasing a muscle to push another muscle, but in the whole end makes the organism produce a better output, well,
-  that was the goal in the beginning, is the output ... You make sure in the terminology in the live benchmark engine's content and
+  that was the goal in the beginning, is the output ... You make sure in the terminology in the live engine's content and
   disclosures that's how do no harm is meant to mean"). Its meaning is written once, in `DISCLOSURES.md` section 3, and the
   key (`tools/readings.py`), both manuals, the README, the safety case and the theory carry it; the engine that stands
   keeps its strictest form, and the engine's own words and the trade between muscles come with the next version, through
@@ -852,7 +833,7 @@ the founder overrides one in the conversation.
   autoscaler moved, no processor conveyed, no power capped, so the pods are exactly native's; the governor only parks a
   machine the cloud already made, after its own trial, and wakes it on a breach. No more pods and no more machines than
   native: the bill can only fall or stay. The bill and the machines aim lower, and work, speed and failures must read
-  STEADY or GAIN. The benefit of the max belongs where Omni-Compass sits in the engine before the cloud, or in the
+  EVEN or GAIN. The benefit of the max belongs where Omni-Compass sits in the engine before the cloud, or in the
   chip at its other end. Runs of the max in the cloud are stopped and kept as such, counted in no bill result.
 - **On autopilot: no babysitting tax** (the founder's words of 14 October, night). Omni-Compass is an autopilot,
   self-running, self-steering and self-auditing inside the system like a self-driving car: nobody turns a knob, nobody
@@ -884,8 +865,8 @@ the founder overrides one in the conversation.
     everything and all, for whoever owns or licenses Omni-Compass and so must know the whole mechanism: the philosophy and
     theory (`docs/book/THEORY.md`, `docs/book/DECLARATION.md`), the mathematics, the mechanism, how it is built, the
     engine's source, every result, and the wiring. Every fix realigns all three.
-  - **The Live Benchmark Engine Manual** (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` and `.pdf`, `build_book.py --live`): nothing more
-    than the interpretation of the live benchmark engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`) for the operator at the
+  - **The Live Engine Manual** (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` and `.pdf`, `build_book.py --live`): nothing more
+    than the interpretation of the live engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`) for the operator at the
     dashboard: how to follow the wall and the switch, read every gauge and knob, trace a tile to its record, and see the
     mechanism of action native beside Omni-Compass as the monitors show it; no theory, no engine internals beyond what the
     page itself prints, no wiring. It names the page's sections by title and anchor, in the page's own order (its "Engine
@@ -939,7 +920,7 @@ the founder overrides one in the conversation.
   `.github/copilot-instructions.md` and `.cursorrules`, each ordering the notice on every answer of any length; the
   license makes a copy without it a breach. Those instructions point to the notice at the top and end of their own file
   (a second copy near the top is stripped by `tools/legal.py`).
-- **The founder hears where things stand** in every report: what is running, what landed, what reads GAIN, STEADY or LOSS,
+- **The founder hears where things stand** in every report: what is running, what landed, what reads GAIN, EVEN or LOSS,
   and what is still on an older engine, in plain words.
 - **The founder's prompt rules** (his document "A.I. prompt rules"), as they apply here:
   - Type: all text (body, tables, lists, code) at **11 pt or larger** on a line height of at least **1.5**; only running
@@ -959,9 +940,9 @@ the founder overrides one in the conversation.
 
 ## Orders of 13 October
 
-- **GAIN, STEADY, LOSS** (the founder's order of 13 October, evening: "better, same and worse are going to be gain, even and
+- **GAIN, EVEN, LOSS** (the founder's order of 13 October, evening: "better, same and worse are going to be gain, even and
   loss, wherever and ever, all over where it lives, where it used to live"). Every judged reading, in every table, page,
-  report, program output and the manual, is GAIN, STEADY or LOSS, decided by what the gauge is for and never by the sign of
+  report, program output and the manual, is GAIN, EVEN or LOSS, decided by what the gauge is for and never by the sign of
   its number: time waited, missed or failed, a fall is GAIN; work done, a rise is GAIN; a resource spent or held, a fall
   is a cut, a GAIN, and a rise is **power given**, never a loss. Better/worse, lower/higher-as-a-verdict and toward/away
   are not used. The key (G.A.I.N. Growth, Advantage, Improvement, Net-positive; E.V.E.N. Equalized, Verified baseline,
@@ -1050,8 +1031,8 @@ the founder overrides one in the conversation.
 - The Operator's Manual (`docs/OMNI_COMPASS_MANUAL.md`, `python3 docs/book/build_book.py`) is the wiring and operating
   manual, with every muscle's wiring and card (Appendix E); the Owner's Manual (`docs/OMNI_COMPASS_OWNERS_MANUAL.md`,
   `build_book.py --owner`) explains the physics, philosophy, mechanism and wiring, how to read every metric, every result,
-  and holds the muscle catalog, the register and the engine's source; the Live Benchmark Engine Manual
-  (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`, `build_book.py --live`) is how to read the live benchmark engine page.
+  and holds the muscle catalog, the register and the engine's source; the Live Engine Manual
+  (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`, `build_book.py --live`) is how to read the live engine page.
 - Zips on request: split into parts under the upload limit, each part openable on its own, built from a pushed commit.
 - Never put a model identifier in a commit, PR or file.
 
