@@ -896,7 +896,7 @@ TERMS = [
       "Every signal shows all four live words, the lit one bright and the rest dim, on native's side and on Omni-Compass's side "
       "alike: Omni-Compass's redline reflex is built never to let a muscle redline, and the red is still wired, so that if one does "
       "(a fault, a bug) it is seen at once, and the kill switch hands everything back to native in the same instant. The engine "
-      "that stands, omni-v21, carries the rule in its immune system, knob by knob (omnicompass/immune.py and its C++ twin "
+      "that stands carries the rule in its immune system, knob by knob, landed on 25 October (omnicompass/immune.py and its C++ twin "
       "cpp/src/immune.cpp): over its line three decisions, stuck, and native's twin lower by more than 5%, the knob is handed to "
       "native for 10 decisions, doubling up to 160; where native is not stronger Omni-Compass stays. The page's live model applies "
       "the same rule, with the engine's own numbers, to every muscle it draws.",
