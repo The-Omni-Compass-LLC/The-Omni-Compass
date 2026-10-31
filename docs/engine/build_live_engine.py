@@ -1161,6 +1161,67 @@ def glossary() -> dict:
     return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
 
 
+LAW_SCOPE = ("omni_controller/*.py", "omni_orchestrator/*.py", "realms/*.py", "tools/run_*.py")
+
+
+def law_wires() -> dict:
+    """Every governor wire that builds the compass law (omnicompass/compass_law.py CompassLaw), read from its source at the build:
+    the file and line, whether it multiplies k_d by three after building it (`<law>.kd *= 3`), sets k_d itself, or keeps the class's
+    critical damping, and its velocity smoothing s (a literal, a module constant resolved from the same file, or the class default).
+    Nothing typed: the page's words on k_d and s are this list, so a wire changed in the repository changes them at the next build."""
+    law_src = (ROOT / "omnicompass" / "compass_law.py").read_text(encoding="utf-8")
+    m = re.search(r"^\s*smooth:\s*float\s*=\s*([0-9.]+)", law_src, re.M)
+    default_s = float(m.group(1)) if m else None
+    num = r"-?[0-9]+(?:\.[0-9]+)?"
+    out = []
+    files = sorted({p for pat in LAW_SCOPE for p in ROOT.glob(pat)})
+    for p in files:
+        src = p.read_text(encoding="utf-8")
+        if "CompassLaw(" not in src:
+            continue
+        lines = src.split("\n")
+        consts = {}
+        for ln in lines:                                     # module constants: NAME = 1.0, or NAME_A, NAME_B = 1.0, 0.5
+            mm = re.match(r"^([A-Z_][A-Z0-9_]*(?:\s*,\s*[A-Z_][A-Z0-9_]*)*)\s*=\s*(" + num + r"(?:\s*,\s*" + num + r")*)\s*(?:#.*)?$", ln)
+            if mm:
+                for k, v in zip(re.split(r"\s*,\s*", mm.group(1)), re.split(r"\s*,\s*", mm.group(2))):
+                    consts[k] = float(v)
+        for i, ln in enumerate(lines):
+            if "CompassLaw(" not in ln or re.match(r"\s*(class|from|import|#)", ln):
+                continue
+            j, depth, call = ln.index("CompassLaw(") + len("CompassLaw("), 1, ""
+            text, k = ln, i
+            while depth and k < len(lines):
+                seg = text[j:] if k == i else lines[k]
+                for ch in seg:
+                    if ch == "(":
+                        depth += 1
+                    elif ch == ")":
+                        depth -= 1
+                        if not depth:
+                            break
+                    call += ch
+                if depth:
+                    k += 1
+                    call += " "
+            lhs = ln.split("CompassLaw(")[0]
+            var = re.search(r"([\w.]+)\s*=\s*(?:[\w.]+\.)?$", lhs.strip())
+            var = var.group(1) if var else None
+            tail = "\n".join(lines[k + 1:k + 7])
+            tripled = bool(var) and re.search(re.escape(var.split(".")[-1]) + r"\.kd\s*\*=\s*3(?:\.0)?\b", tail) is not None
+            kd_arg = re.search(r"\bkd\s*=\s*([^,)]+)", call)
+            sm = re.search(r"\bsmooth\s*=\s*([\w.]+)", call)
+            if sm:
+                e = sm.group(1); sv = float(e) if re.fullmatch(num, e) else consts.get(e.split(".")[-1])
+                s_src = "literal" if re.fullmatch(num, e) else (f"{e}, the module's constant" if sv is not None else f"{e}, not resolved")
+            else:
+                sv, s_src = default_s, "the class default"
+            out.append({"file": str(p.relative_to(ROOT)), "line": i + 1, "law": var,
+                        "kd": "x3" if tripled else (f"set: {kd_arg.group(1).strip()}" if kd_arg else "critical"),
+                        "smooth": sv, "smooth_from": s_src})
+    return {"law": "omnicompass/compass_law.py", "default_smooth": default_s, "scope": list(LAW_SCOPE), "wires": out}
+
+
 def records(runs: bool) -> dict:
     import export_controller_trace as XC
     import export_harness_trace as XH
@@ -1222,7 +1283,8 @@ def records(runs: bool) -> dict:
     build["ledger"] = led
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
             "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x,
-            "beatsweep": beat_sweep(), "dial": dial(), "coremc": core_mc(), "onnative": on_native_abc(), "scenarios": scenarios20(), "injgrid": injection_grid(), "audit": verdict_audit(), "glossary": glossary()}
+            "beatsweep": beat_sweep(), "dial": dial(), "coremc": core_mc(), "onnative": on_native_abc(), "scenarios": scenarios20(), "injgrid": injection_grid(), "audit": verdict_audit(), "glossary": glossary(),
+            "lawwires": law_wires()}
 
 
 def embedded(page: str, key: str):

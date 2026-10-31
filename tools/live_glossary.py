@@ -500,10 +500,13 @@ TERMS = [
       [(LAW, "K_P x (position - center): gentle near the bottom, harder up the walls")], aka=["k[p]", "k_p", "the spring"]),
     T("k[d]", L, "The damping: k[d] × velocity meets whatever is shoving the position (a load rising, heat building) with an equal "
       "and opposite push. Chosen for critical damping, k[d] = max(0, 2√(k[p]·τ/dt) − 1)·dt, the reading glides to the centre and "
-      "stops, no overshoot, no ringing; every governor that runs the law sets it at three times that, so a rising load is met "
-      "before it reaches the wall.",
+      "stops, no overshoot, no ringing. Some wires set it at three times that, so a rising load is met before it reaches the wall "
+      "(the Kubernetes governor, the GPU governors, the realms' arms and the grid's runner); the data stores' runners, the "
+      "orchestrator's brain and the other simulators keep the class's critical damping. The page's section 4g lists every wire, "
+      "read from the repository at each build.",
       [(LAW, "K_D x velocity: whatever is shoving the position"),
-       (PAGE_F, "every governor that runs the law sets it at three times that")], aka=["k[d]", "k_d", "the damping"]),
+       ("omni_controller/controller.py", "self.compass_law.kd *= 3.0"),
+       (PAGE_F, "Which wires multiply k_d by three")], aka=["k[d]", "k_d", "the damping"]),
     T("A", L, "The authority: the force's ceiling. The force is A × tanh(raw / A), a spring near the centre that bends over and "
       "flattens into its maximum A, never a corner, never a hammer.",
       [(LAW, "the force is A x tanh(raw / A)")], aka=["the authority", "A·tanh"]),
@@ -555,10 +558,11 @@ TERMS = [
       [(PAGE_F, "Piece 4 · the governor: one law coupling every muscle"),
        (THEO, "the one governor that couples every muscle to one law with no outside authority (piece 4)")],
       aka=["one law coupling every muscle", "the governor's law"]),
-    T("RK4", B, "The fourth-order Runge–Kutta step that integrates the engine's six states (E, U, I_U, S, B, Ḃ): ten micro steps of "
-      "0.01 a decision on the page; 20 macro steps of 10 micro steps in the core's Monte Carlo, the bounded command held across "
-      "the four stages.",
-      [(CORE, "six-state ODE, RK4 integrator"), (PAGE_F, "RK4, ten micro steps of 0.01"),
+    T("RK4", B, "The fourth-order Runge–Kutta step that integrates the engine's six states (E, U, I_U, S, B, Ḃ): ten micro steps "
+      "over 0.1·k of the engine's time a decision, k = the decision's period over 60 s (omni-v16's period rule; 0.01 each at one "
+      "decision a minute); 20 macro steps of 10 micro steps in the core's Monte Carlo, the bounded command held across the four "
+      "stages.",
+      [(CORE, "six-state ODE, RK4 integrator"), (PAGE_F, "RK4, ten micro steps over macro_dt = 0.1·k"),
        ("tools/core_runs.py", "the fourth-order Runge–Kutta step, 20 macro steps of 10")], aka=["RK4", "Runge–Kutta", "Runge-Kutta"]),
     T("push", B, "The command the brain asks for to bring unity back to its basin, as a share of its authority: "
       "push = clip(−f_U + 12(1 − U), ±25)/25. A push above κ's knee holds every give-back.",

@@ -46,7 +46,7 @@ INDEX_FILE = "results/OMNI_INDEX.md"
 # the two sides, and only two (the founder's order of 25 October 2026: Omni-Compass is never by itself); a record's other pairs
 # stay in the record itself, every row shown there
 PAIRS = (("Omni-Compass on top of native", "Omni on native against native",
-          "Omni-Compass on top of Kubernetes' own autoscaling rule on the muscles, never fewer units than the rule"),)
+          "never fewer units than the rule"),)   # the rest of each arm's words is the record's own (arm_words)
 # native and Omni-Compass on native are the only two sides (the founder's order of 25 October: Omni-Compass is never by itself);
 # the record's third arm, Omni direct, stays in its own table as the road and is not read here
 WORD_ORDER = (K.GAIN, K.GAIN_GIVEN, K.GAIN_AND_LOSS, K.STEADY, K.LOSS)
@@ -128,6 +128,23 @@ def standing(stands: str):
             "older": len(bench) - len(on), "older_engines": older}
 
 
+def arm_words(path: Path) -> dict:
+    """Each arm as the record itself describes it (its .md: "Native is ...; Omni on native is ...;"), and where it ran, in the words
+    of the orchestrator it ran on (omni_orchestrator/__init__.py's first line): never typed here, so the answer can never call the
+    yardstick Kubernetes itself. "written by us" is said as whose it is, The Omni-Compass LLC."""
+    md = path.with_suffix(".md").read_text(encoding="utf-8")
+    nat = re.search(r"Native is (.+?);", md)
+    onn = re.search(r"Omni on native is (.+?);", md)
+    if not nat or not onn:
+        raise SystemExit(f"headline: {path.with_suffix('.md').name} does not say what its arms are")
+    doc = (ROOT / "omni_orchestrator" / "__init__.py").read_text(encoding="utf-8")
+    head = re.search(r'"""(.+?)(?: \(|\.)', doc).group(1)            # "Omni-Compass's own orchestrator: the organism run without Kubernetes"
+    who, what = head.split(": ", 1)
+    return {"native": nat.group(1).replace(", written by us", ", as written by The Omni-Compass LLC"),
+            "on_native": onn.group(1).replace("that rule", "the same rule"),
+            "where": f"{who} (`omni_orchestrator`), {what}"}
+
+
 def model():
     path, rec = newest_record()
     engine = rec["engine"].split(" (")[0]
@@ -139,6 +156,7 @@ def model():
     azure_v = sorted(ROOT.glob(f"results/live/{engine.upper().replace('OMNI-', '')}_AKS*.md"))
     stands = the_engine_that_stands()
     return {"path": path.relative_to(ROOT).as_posix(), "rec": rec, "engine": engine, "scen": scen, "azure": azure_v, "whole": whole_beside(),
+            "arms": arm_words(path),
             "stands": stands, "standing": standing(stands)}
 
 
@@ -218,13 +236,15 @@ def markdown(m) -> str:
     s0 = m["scen"][0]
     where = (f"on the engine that stands ({eng})" if eng == stands else
              f"on {eng}, the newest engine with its three runs in (the engine that stands, {stands}, runs it again)")
-    L += ["", f"The real test of the whole loop, {where}, three runs on GitHub's own machines: Omni-Compass on top of native did "
+    A = m["arms"]
+    L += ["", f"The real test of the whole loop, {where}, three runs on GitHub's own machines, on {A['where']}: native is "
+          f"{A['native']}, and the other side is {A['on_native']}. On top of native, Omni-Compass did "
           f"{100 * s0['work']:.1f}% more work than native and answered {100 * abs(s0['p95']):.1f}% faster at the 95th percentile."]
     L += ["", "| Scenario | Signal | Work | Response (95th percentile) | Machines | Units |", "|---|---|---|---|---|---|",
-          f"| **Native**: Kubernetes' own autoscaling rule on the muscles | {img('lead')} the baseline | the baseline | the baseline | the baseline | the baseline |"]
+          f"| **Native**: {A['native']}, on {A['where']} | {img('lead')} the baseline | the baseline | the baseline | the baseline | the baseline |"]
     for s in m["scen"]:
         r = s["rows"]
-        L.append(f"| **{s['name']}**: {s['how']} | {img(s['signal'])} **{SIGNAL[s['signal']][0]}** | "
+        L.append(f"| **{s['name']}**: {A['on_native']}, {s['how']} | {img(s['signal'])} **{SIGNAL[s['signal']][0]}** | "
                  + " | ".join(said(r[g], g) if r[g] else "not read" for g, _ in GAUGES) + " |")
     L += ["", f"The signals: {img('ok')} accelerating, a GAIN and no LOSS; {img('lead')} steady, every row STEADY; {img('red')} "
           "redlining, a LOSS. Units are the service's own copies: Omni-Compass adds them to buy the work and the speed, power given, "

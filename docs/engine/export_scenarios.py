@@ -320,11 +320,12 @@ def runs_of(src, rows):
     if not isinstance(data, dict):
         return
     i = 0
-    for _, g in gauges(data):
+    for path, g in gauges(data):
         rd, aim_raw, rs = bare(g.get("reading")), g.get("aim"), g.get("runs")
         while i < len(rows):
             row = rows[i]; i += 1
             if bare(row["r"].split("shown and not counted: ")[-1]) == rd:
+                row["key"] = path[-1]                     # the gauge's own name in the table's JSON (for the key's resource list)
                 a = aim_of(aim_raw) if aim_raw else None
                 if a in AIM_CODE and isinstance(rs, list) and len(rs) == 3 and all(isinstance(r, dict) and r.get("diff") is not None
                                                                                   and r.get("native") is not None for r in rs):
@@ -385,7 +386,12 @@ def receipt(name, path=None):
             for r in rows if r["w"] == "STEADY"]
     # the rows a table shows and does not judge (its preregistration's own rule), kept so their sizes are seen: a resource a
     # table only shows, CPU used beside a response time, is the price of the work
-    shown = [{"s": r["s"], "g": r["g"], "abc": r["abc"], "r": r["r"], **({"tuning": True} if r["w"] == "tuning" else {})}
+    # a shown row carries no aim of its own (its table does not judge it); whether it is a resource spent or held is the key's own list
+    # (tools/readings.py SPENT_GAUGES, by the gauge's name in the table's JSON), never a guess from its words: a row of a table with no
+    # JSON twin carries no such mark
+    from tools.readings import SPENT_GAUGES
+    shown = [{"s": r["s"], "g": r["g"], "abc": r["abc"], "r": r["r"], **({"tuning": True} if r["w"] == "tuning" else {}),
+              **({"key": r["key"], "spent": r["key"] in SPENT_GAUGES} if "key" in r else {})}
              for r in rows if r["w"] in ("shown", "tuning")]
     return {"file": f"results/live/{name}.md" if not path else None, "title": title, "rows": [r for r in rows if r["w"] not in ("STEADY", "shown", "tuning")],
             "count": count, "even": even, "shown": shown}
