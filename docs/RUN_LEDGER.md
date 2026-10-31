@@ -79,6 +79,13 @@ omni-v12 only as the engine before whose runs its preregistration's amendment 2 
 5. The three tables above still on omni-v3.
 6. The LOSS rows on omni-v21, each in `docs/LOSS_LEDGER.md`: the pod start wait on the Google day (more pods started; each
    starts as fast) and on Goldilocks (each pod slower too), CruiseKube's response time by the mean, and Kafka's.
+7. Omni-Compass by itself on kind (`kubernetes by itself`, three arms): every solo arm since omni-v19 had the governor's pod
+   writes refused, 15 of 15 decisions in every repetition (the rig's identity lacked the workload's `deployments/scale`, the
+   resource `kubectl scale` patches). omni-v21's three runs (40224674073, 40247823226, 40269972665) were admitted with the
+   workload held at the operator's count and are read in no table; omni-v22's two (41115877114, 41153103781) were marked
+   invalid by the rig's own end read of the autoscaler the arm removes by design (a read added 29 October). Both causes fixed
+   31 October (`docs/SOLO_PREREGISTRATION.md`, amendment 1); A and B queued again behind the campaign (`scripts/reruns.txt`);
+   its table, when its three runs land, stays in the record and is not carried on the front page (the order of 25 October).
 
 ---
 

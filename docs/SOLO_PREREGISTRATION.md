@@ -88,6 +88,36 @@ Every row is reported, LOSS included; a LOSS is answered by finding where the me
 - Kind has no cluster autoscaler: on kind, native's machine count is static, so the machine muscle is the same in both
   Omni-Compass arms there; only the pods differ.
 
+## Amendment 1 (31 October 2026, written before the runs it governs): the arm's pod writes were refused by the rig's own identity
+
+**What the runs' own files read.** In every solo arm run on kind from omni-v19 to omni-v22 the governor's pod muscle wrote
+nothing: each of its 15 decisions a window (one every 60 s over 900 s) ended in `kubectl scale deployment php-apache
+--replicas=N` refused, `User "system:serviceaccount:omni-compass:omni-compass" cannot patch resource "deployments/scale" in API
+group "apps"` (`controller.log` and `audit.jsonl`, `consecutive_failures` 1 to 15, in every repetition). The rig's identity
+(`deploy/kind/rbac-omni.yaml`) granted `patch` on `deployments` by name; under Kubernetes' RBAC the scale subresource,
+`deployments/scale`, is a resource of its own, and `kubectl scale` patches it. The preflight proved `patch deployment/php-apache`
+and never the subresource, so it passed. The machine and conveyance muscles wrote as always (69 writes a window), so the window's
+no-write check did not fire either. The workload stayed at the operator's count, one replica, in every solo window.
+
+- omni-v21's three runs of the entry `kubernetes by itself` (benchmark-reps 40224674073, 40247823226 and 40269972665, 25 and 26
+  October) were admitted by the rig of their day and are read in no table: their solo arm is void (an arm whose governor could not
+  move the knob it is there to move), their native and Omni-Compass and native arms stand only as those runs' own record.
+- omni-v22's first two runs (41115877114 and 41153103781, 30 and 31 October) were marked invalid in every repetition by a second
+  fault in the rig itself: the end-of-window record added on 29 October reads the pod autoscaler (`hpa_end.json`), which the solo
+  arm removes by design; the read failed six times over a minute and ended the arm with exit 1, so the arm's own words were never
+  printed (`end_reads.err`: `horizontalpodautoscalers.autoscaling "php-apache" not found`). Both runs count as started in the
+  campaign and are read in no table.
+
+**What changes, in the rig only (no engine file moves; omni-v22 stands).** (1) The identity gains `get`, `patch` and `update` on
+`deployments/scale` for the named workload alone (`deploy/kind/rbac-omni.yaml`; for a licensee `deploy/rbac-own-pods.yaml`, the
+Operator's Manual, chapter 14). (2) The preflight proves the scale write by name in the "can" list and proves that the load
+generator's scale is refused in the "cannot" list. (3) The end-of-window record of the solo arm reads the workload's own object
+(`workload_end.json`) in place of the autoscaler it has removed. (4) `tests/test_kind_rig_rbac.py` fails a rig without any of
+the three. The entry is queued again, A, B and C, in a new block of `scripts/reruns.txt` behind every entry of the campaign (the
+rule of 18 October); its C of the first block runs on the amended rig. Under the founder's order of 25 October (Omni-Compass is
+never by itself) the arm's table, when its three runs land, stays in the record (`results/live/`) and is not carried on the
+front page or the benefit board, as the orchestrator's third arm is kept.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
